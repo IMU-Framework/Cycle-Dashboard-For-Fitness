@@ -30,25 +30,10 @@
 
     html, body {
       margin: 0; padding: 0;
-      background: #ECECEE;
+      background: var(--bg);
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Noto Sans TC", "PingFang TC", sans-serif;
       -webkit-font-smoothing: antialiased;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 40px 0;
-    }
-
-    /* When opened as installed PWA, fill viewport, no letterbox padding. */
-    @media (display-mode: standalone) {
-      html, body {
-        padding: 0 !important;
-        min-height: 100dvh;
-        background: var(--bg, #f2f2f7);
-        align-items: stretch;
-        justify-content: stretch;
-      }
+      min-height: 100dvh;
     }
 
     button { font-family: inherit; cursor: pointer; }
