@@ -1,6 +1,6 @@
 // Cycle Dashboard service worker — app-shell cache.
 // Bump CACHE_VERSION whenever the asset list changes.
-const CACHE_VERSION = 'cycle-dashboard-v2';
+const CACHE_VERSION = 'cycle-dashboard-v3';
 
 const ASSETS = [
   './mobile.html',

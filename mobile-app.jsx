@@ -70,10 +70,8 @@ function MobileApp() {
 
 
   return (
-    <div className={'m-app' + (isStandalone ? ' m-app--standalone' : '')}>
-      {isStandalone ? screen :
-      <window.IOSDevice width={402} height={874}>{screen}</window.IOSDevice>
-      }
+    <div className="m-app m-app--standalone">
+      {screen}
       <window.TweaksPanel title="設定">
         <window.TweakSection label="今天">
           <window.TweakToggle label="使用真實今天"
