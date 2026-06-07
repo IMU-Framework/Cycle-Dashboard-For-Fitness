@@ -42,22 +42,7 @@ function MobileApp() {
     setSelected(d);
   };
 
-  // Detect standalone mode (PWA installed / opened from home screen) — when so,
-  // drop the iOS device frame so the app fills the real viewport.
-  const [isStandalone, setIsStandalone] = useStateM(() => {
-    if (typeof window === 'undefined') return false;
-    const params = new URLSearchParams(location.search);
-    if (params.get('pwa') === '1') return true;
-    if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) return true;
-    if (window.navigator.standalone) return true; // iOS Safari
-    return false;
-  });
-  useEffectM(() => {
-    const mq = window.matchMedia('(display-mode: standalone)');
-    const onChange = () => setIsStandalone(mq.matches);
-    mq.addEventListener && mq.addEventListener('change', onChange);
-    return () => mq.removeEventListener && mq.removeEventListener('change', onChange);
-  }, []);
+  const isStandalone = true;
 
   const screen =
   <div className={'m-screen' + (isStandalone ? ' is-standalone' : '')} data-screen-label={`02 Mobile · ${tab}`}>
