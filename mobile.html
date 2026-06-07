@@ -77,10 +77,21 @@
       width: 100vw;
       height: 100dvh;
       min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
     }
     .m-screen.is-standalone .m-screen__scroll {
-      top: env(safe-area-inset-top, 0px);
-      bottom: calc(58px + env(safe-area-inset-bottom, 0px));
+      position: static;
+      top: auto; bottom: auto; left: auto; right: auto;
+      flex: 1;
+      min-height: 0;
+    }
+    .m-tabbar--standalone {
+      position: static;
+      bottom: auto;
+      flex-shrink: 0;
+      height: calc(52px + env(safe-area-inset-bottom, 0px));
+      padding-bottom: env(safe-area-inset-bottom, 0px);
     }
 
     /* ── Shared top bar ─────────────────────────────────────────────── */
@@ -88,7 +99,9 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 20px 18px 12px;
+      padding: max(10px, env(safe-area-inset-top, 10px)) 18px 8px;
+      flex-shrink: 0;
+      background: var(--bg);
     }
     .m-topbar__gear {
       width: 36px; height: 36px;
@@ -103,6 +116,37 @@
     .m-topbar__title {
       font-size: 15px;
       font-weight: 600;
+      color: var(--ink);
+      letter-spacing: 0.02em;
+    }
+
+    /* ── Shared date navigator ───────────────────────────────────────── */
+    .m-datnav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 0 12px;
+    }
+    .m-datnav__btn {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      color: var(--ink);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .m-datnav__center {
+      flex: 1;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .m-datnav__label {
+      font-size: 17px;
+      font-weight: 700;
       color: var(--ink);
       letter-spacing: 0.02em;
     }
@@ -322,7 +366,7 @@
     }
 
     /* ── Calendar screen ─────────────────────────────────────────────── */
-    .m-cal { padding: 0 16px 16px; }
+    .m-cal { padding: 0 18px 16px; }
     .m-cal__nav {
       display: flex;
       align-items: center;
@@ -416,7 +460,7 @@
     }
 
     /* ── Reference screen ────────────────────────────────────────────── */
-    .m-ref { padding: 0 16px 24px; }
+    .m-ref { padding: 0 18px 24px; }
     .m-ref__head { padding: 0 4px 16px; }
     .m-ref__title {
       margin: 0;

@@ -1,6 +1,6 @@
 // Cycle Dashboard service worker — app-shell cache.
 // Bump CACHE_VERSION whenever the asset list changes.
-const CACHE_VERSION = 'cycle-dashboard-v4';
+const CACHE_VERSION = 'cycle-dashboard-v5';
 
 const ASSETS = [
   './mobile.html',
@@ -40,21 +40,17 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Stale-while-revalidate for shell assets, network-first for everything else.
+// Network-first: always try the network; fall back to cache when offline.
 self.addEventListener('fetch', (event) => {
   const req = event.request;
   if (req.method !== 'GET') return;
   event.respondWith(
-    caches.match(req).then((cached) => {
-      const networkFetch = fetch(req).then((res) => {
-        // Only cache successful (or opaque) responses.
-        if (res && (res.status === 200 || res.type === 'opaque')) {
-          const clone = res.clone();
-          caches.open(CACHE_VERSION).then((cache) => cache.put(req, clone));
-        }
-        return res;
-      }).catch(() => cached);
-      return cached || networkFetch;
-    })
+    fetch(req).then((res) => {
+      if (res && (res.status === 200 || res.type === 'opaque')) {
+        const clone = res.clone();
+        caches.open(CACHE_VERSION).then((cache) => cache.put(req, clone));
+      }
+      return res;
+    }).catch(() => caches.match(req))
   );
 });

@@ -42,31 +42,29 @@ function MobileApp() {
     setSelected(d);
   };
 
-  const isStandalone = true;
+  const TITLES = { today: '週期儀表板', calendar: '週期月曆', reference: '週期策略' };
 
-  const screen =
-  <div className={'m-screen' + (isStandalone ? ' is-standalone' : '')} data-screen-label={`02 Mobile · ${tab}`}>
+  const screen = (
+    <div className="m-screen is-standalone" data-screen-label={`02 Mobile · ${tab}`}>
+      <ScreenHeader title={TITLES[tab]} />
       <div className="m-screen__scroll">
         {tab === 'today' &&
-      <TodayScreen
-        today={today} selected={selected} phase={phase}
-        cycleDay={cycleDay} cycleLen={cycleLen} cycleStart={cycleStart}
-        nextPhase={nextPhase} isToday={isToday}
-        phaseDays={phaseDays}
-        onPrev={() => stepDay(-1)} onNext={() => stepDay(1)}
-        onJumpToday={() => setSelected(today)} />
-
-      }
+          <TodayScreen
+            today={today} selected={selected} phase={phase}
+            cycleDay={cycleDay} cycleLen={cycleLen} cycleStart={cycleStart}
+            nextPhase={nextPhase} isToday={isToday}
+            phaseDays={phaseDays}
+            onPrev={() => stepDay(-1)} onNext={() => stepDay(1)}
+            onJumpToday={() => setSelected(today)} />}
         {tab === 'calendar' &&
-      <CalendarScreen
-        today={today} selected={selected} setSelected={(d) => {setSelected(d);setTab('today');}}
-        anchor={anchor} phaseDays={phaseDays} />
-
-      }
+          <CalendarScreen
+            today={today} selected={selected} setSelected={(d) => { setSelected(d); setTab('today'); }}
+            anchor={anchor} phaseDays={phaseDays} />}
         {tab === 'reference' && <ReferenceScreen currentKey={phase.key} />}
       </div>
-      <TabBar tab={tab} setTab={setTab} standalone={isStandalone} />
-    </div>;
+      <TabBar tab={tab} setTab={setTab} />
+    </div>
+  );
 
 
   return (
@@ -100,6 +98,25 @@ function MobileApp() {
 
 }
 
+// ─── Shared date navigator ───────────────────────────────────────────────
+function DateNav({ label, onPrev, onNext, prevLabel, nextLabel, children }) {
+  const chevron = (points) => (
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <polyline points={points} />
+    </svg>
+  );
+  return (
+    <div className="m-datnav">
+      <button className="m-datnav__btn" onClick={onPrev} aria-label={prevLabel || '前一個'}>{chevron('15 18 9 12 15 6')}</button>
+      <div className="m-datnav__center">
+        <div className="m-datnav__label">{label}</div>
+        {children}
+      </div>
+      <button className="m-datnav__btn" onClick={onNext} aria-label={nextLabel || '後一個'}>{chevron('9 18 15 12 9 6')}</button>
+    </div>
+  );
+}
+
 // ─── Shared screen header ────────────────────────────────────────────────
 function ScreenHeader({ title }) {
   return (
@@ -131,26 +148,9 @@ function TodayScreen({
 
   return (
     <div className="m-today">
-      <ScreenHeader title="週期儀表板" />
-
-      <div className="m-today__dateline" style={{ margin: "0px 0px 6px" }}>
-        <button className="m-today__navbtn" onClick={onPrev} aria-label="前一天">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-        </button>
-        <div className="m-today__date">
-          <div className="m-today__date-main">{dateLong}</div>
-          {!isToday &&
-          <button className="m-today__back" onClick={onJumpToday}>回到今天</button>
-          }
-        </div>
-        <button className="m-today__navbtn" onClick={onNext} aria-label="後一天">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
-        </button>
-      </div>
+      <DateNav label={dateLong} onPrev={onPrev} onNext={onNext} prevLabel="前一天" nextLabel="後一天">
+        {!isToday && <button className="m-today__back" onClick={onJumpToday}>回到今天</button>}
+      </DateNav>
 
       <CycleRing phase={phase} cycleDay={cycleDay} cycleLen={cycleLen} phaseDays={phaseDays} />
 
@@ -267,20 +267,11 @@ function CalendarScreen({ today, selected, setSelected, anchor, phaseDays }) {
 
   return (
     <div className="m-cal">
-      <ScreenHeader title="週期月曆" />
-      <div className="m-cal__nav">
-        <button className="m-cal__navbtn" onClick={() => setMonthOffset(monthOffset - 1)} aria-label="上個月">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-        </button>
-        <div className="m-cal__monthlabel">{year} 年 {month + 1} 月</div>
-        <button className="m-cal__navbtn" onClick={() => setMonthOffset(monthOffset + 1)} aria-label="下個月">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
-        </button>
-      </div>
+      <DateNav
+        label={`${year} 年 ${month + 1} 月`}
+        onPrev={() => setMonthOffset(monthOffset - 1)}
+        onNext={() => setMonthOffset(monthOffset + 1)}
+        prevLabel="上個月" nextLabel="下個月" />
 
       <div className="m-cal__legend">
         {window.PHASE_ORDER.map((k) => {
@@ -336,7 +327,6 @@ function ReferenceScreen({ currentKey }) {
   const orderedKeys = order.map((_, i) => order[(startIdx + i) % order.length]);
   return (
     <div className="m-ref">
-      <ScreenHeader title="週期策略" />
       {orderedKeys.map((k) => {
         const p = window.PHASES[k];
         const isCur = k === currentKey;
@@ -381,7 +371,7 @@ function ReferenceScreen({ currentKey }) {
 }
 
 // ─── Bottom tab bar ──────────────────────────────────────────────────────
-function TabBar({ tab, setTab, standalone }) {
+function TabBar({ tab, setTab }) {
   const items = [
   { id: 'today', label: '今日', icon:
     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg>
@@ -394,7 +384,7 @@ function TabBar({ tab, setTab, standalone }) {
   }];
 
   return (
-    <div className={'m-tabbar' + (standalone ? ' m-tabbar--standalone' : '')}>
+    <div className="m-tabbar m-tabbar--standalone">
       {items.map((it) =>
       <button
         key={it.id}
