@@ -173,7 +173,7 @@ function TodayScreen({
         <Stat label="本週期開始" value={fmt(cycleStart)} />
         <Stat label="本週期結束" value={fmt(cycleEnd)} />
         {nextPhase ?
-        <Stat label="下一階段" value={`${nextPhase.daysUntil} 天後`} sub={fmt(nextPhase.date)} /> :
+        <Stat label="下一階段" value={<>{fmt(nextPhase.date)}<span className="m-stat__inline-sub">{nextPhase.daysUntil} 天後</span></>} /> :
 
         <Stat label="週期長度" value={`${cycleLen} 天`} />
         }
