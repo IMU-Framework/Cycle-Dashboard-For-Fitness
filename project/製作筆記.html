@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<title>製作筆記 · 週期瘦身儀表板</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=Manrope:wght@500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #FBF7F3;
+    --bg-card: #FFFFFF;
+    --ink: #2A2024;
+    --ink-soft: #5F5057;
+    --ink-mute: #968790;
+    --line: #EDE5DF;
+    --line-soft: #F5EEE9;
+    --pink: #E04A78;
+    --pink-deep: #B83056;
+    --pink-bg: #FCE9EE;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg); color: var(--ink);
+    font-family: "Noto Sans TC", "PingFang TC", "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 56px 24px 96px; }
+
+  /* eyebrow / kicker */
+  .kicker {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: "Manrope", "Noto Sans TC", sans-serif;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--pink-deep);
+    background: var(--pink-bg); border: 1px solid #F4D2DC;
+    padding: 6px 14px; border-radius: 999px;
+  }
+  .logo {
+    display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr;
+    width: 16px; height: 16px; border-radius: 5px; overflow: hidden;
+  }
+  .logo span { display:block; width:100%; height:100%; }
+
+  h1 {
+    font-size: 34px; line-height: 1.28; font-weight: 700;
+    letter-spacing: 0.01em; margin: 18px 0 14px; text-wrap: balance;
+  }
+  .lede {
+    font-size: 17px; line-height: 1.75; color: var(--ink-soft);
+    margin: 0 0 8px; text-wrap: pretty;
+  }
+  .meta {
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    margin: 20px 0 0; padding-top: 18px; border-top: 1px solid var(--line);
+    font-size: 13px; color: var(--ink-mute);
+  }
+  .meta b { color: var(--ink-soft); font-weight: 600; }
+  .meta__dot { width: 4px; height: 4px; border-radius: 50%; background: var(--ink-mute); }
+
+  /* step block */
+  .step { margin-top: 52px; }
+  .step__no {
+    font-family: "Manrope", sans-serif; font-size: 13px; font-weight: 700;
+    letter-spacing: 0.16em; color: var(--pink); margin-bottom: 8px;
+  }
+  .step__title {
+    font-size: 22px; font-weight: 700; letter-spacing: 0.01em;
+    margin: 0 0 12px; line-height: 1.4;
+  }
+  .step__body { font-size: 16px; line-height: 1.85; color: var(--ink-soft); margin: 0; text-wrap: pretty; }
+  .step__body b { color: var(--ink); font-weight: 600; }
+
+  figure {
+    margin: 20px 0 0; background: var(--bg-card);
+    border: 1px solid var(--line); border-radius: 16px; overflow: hidden;
+    box-shadow: 0 1px 0 rgba(40,20,30,0.04), 0 18px 40px -28px rgba(40,20,30,0.35);
+  }
+  figure img { display: block; width: 100%; height: auto; }
+  figure.is-phone {
+    background: linear-gradient(170deg, #F3ECE7 0%, #FBF7F3 100%);
+    border: 1px solid var(--line);
+  }
+  figure.is-phone img { max-width: 380px; margin: 0 auto; }
+  figcaption {
+    font-size: 12.5px; color: var(--ink-mute); letter-spacing: 0.02em;
+    padding: 12px 16px; border-top: 1px solid var(--line); background: var(--line-soft);
+  }
+
+  .closing {
+    margin-top: 56px; padding: 24px 26px; border-radius: 16px;
+    background: var(--bg-card); border: 1px solid var(--line);
+  }
+  .closing p { margin: 0; font-size: 15.5px; line-height: 1.8; color: var(--ink-soft); }
+  .closing p + p { margin-top: 12px; }
+  .closing .note { font-size: 13px; color: var(--ink-mute); }
+
+  @media (max-width: 560px) {
+    .wrap { padding: 36px 18px 72px; }
+    h1 { font-size: 27px; }
+  }
+</style>
+</head>
+<body>
+  <article class="wrap">
+
+    <span class="kicker">
+      <span class="logo" aria-hidden="true">
+        <span style="background:#FFEB6B"></span><span style="background:#E04A78"></span><span style="background:#F5A8B7"></span><span style="background:#DCDCD6"></span>
+      </span>
+      Build Notes · 製作筆記
+    </span>
+
+    <h1>我做了一個「跟著生理週期瘦身」的小儀表板</h1>
+
+    <p class="lede">
+      網路上流傳一張「生理週期 × 減脂」對照表——什麼時候火力全開、什麼時候該休養，講得很清楚。
+      但每天要對著表格算「我今天在哪一階段」實在麻煩，於是我把它做成一個<b>會自己算</b>的儀表板。
+    </p>
+
+    <div class="meta">
+      <span><b>1 分鐘</b> 閱讀</span>
+      <span class="meta__dot"></span>
+      <span>自製 App · Web / PWA</span>
+      <span class="meta__dot"></span>
+      <span>5 個關鍵畫面</span>
+    </div>
+
+    <!-- Step 1 -->
+    <section class="step">
+      <div class="step__no">01</div>
+      <h2 class="step__title">把一張表，變成「今天該做什麼」</h2>
+      <p class="step__body">
+        一打開就直接告訴你今天落在哪個階段——<b>生理期、超速期、平快期、經前休息期</b>——
+        以及週期第幾天。一條彩色進度條讓你一眼定位，旁邊順手算好本週期的起訖與下一階段倒數。
+      </p>
+      <figure>
+        <img src="screenshots/story/01-dashboard.png" alt="今日儀表板：階段標籤、週期進度條與本週期統計" />
+        <figcaption>主畫面 · 今天是哪一階段、第幾天，一眼看完</figcaption>
+      </figure>
+    </section>
+
+    <!-- Step 2 -->
+    <section class="step">
+      <div class="step__no">02</div>
+      <h2 class="step__title">每個階段的策略，還能直接問 AI</h2>
+      <p class="step__body">
+        每個階段都對應到該注意的<b>飲食與運動重點</b>。我還接上了 AI 顧問，會帶入「今天的階段」回答——
+        像是「現在可以吃甜點嗎」「30 分鐘內適合做什麼運動」，不必再自己翻表對照。
+      </p>
+      <figure>
+        <img src="screenshots/story/02-strategy-ai.png" alt="階段策略說明、運動建議與 AI 問答輸入框" />
+        <figcaption>階段策略 + AI 顧問 · 針對當前階段量身回答</figcaption>
+      </figure>
+    </section>
+
+    <!-- Step 3 -->
+    <section class="step">
+      <div class="step__no">03</div>
+      <h2 class="step__title">用月曆，先把整季規劃好</h2>
+      <p class="step__body">
+        把 5–12 月整季依四階段著色，哪幾天進入<b>黃金減脂期</b>一目了然。
+        要安排聚餐、出遊或加強訓練時，提前一眼就知道該避開還是該衝。
+      </p>
+      <figure>
+        <img src="screenshots/story/03-calendar.png" alt="多月份月曆，各日依週期階段上色" />
+        <figcaption>週期月曆 · 整季著色，提前規劃飲食與訓練</figcaption>
+      </figure>
+    </section>
+
+    <!-- Step 4 -->
+    <section class="step">
+      <div class="step__no">04</div>
+      <h2 class="step__title">一張完整對照表，隨時速查</h2>
+      <p class="step__body">
+        把四個階段的<b>瘦身時機、飲食、運動、身體狀況</b>並排成一張表，
+        當作隨時翻閱的速查卡——這也是整個 App 最初的資料來源。
+      </p>
+      <figure>
+        <img src="screenshots/story/04-reference.png" alt="四階段週期策略完整對照表" />
+        <figcaption>週期策略對照表 · 四階段並排，一次看懂</figcaption>
+      </figure>
+    </section>
+
+    <!-- Step 5 -->
+    <section class="step">
+      <div class="step__no">05</div>
+      <h2 class="step__title">做成手機 App，隨身帶著走</h2>
+      <p class="step__body">
+        最後包成 <b>PWA</b>，加到手機主畫面就像原生 App 一樣開啟。
+        出門在外也能隨時看今天的狀態，把「跟著週期生活」變成順手的小習慣。
+      </p>
+      <figure class="is-phone">
+        <img src="screenshots/story/05-mobile.png" alt="手機版週期儀表板，環形進度與當日階段" />
+        <figcaption>手機版 / PWA · 加到主畫面隨身查看</figcaption>
+      </figure>
+    </section>
+
+    <!-- Closing -->
+    <div class="closing">
+      <p>
+        週期長度、各階段天數與「最近一次生理期開始日」都能自己調——因為<b>每個人的週期都不一樣</b>，
+        工具該配合人，而不是反過來。
+      </p>
+      <p class="note">
+        ※ 本工具僅為一般保健建議與行為提醒，不取代專業醫療意見。
+      </p>
+    </div>
+
+  </article>
+</body>
+</html>
