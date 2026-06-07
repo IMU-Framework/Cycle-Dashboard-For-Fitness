@@ -83,6 +83,30 @@
       bottom: calc(58px + env(safe-area-inset-bottom, 0px));
     }
 
+    /* ── Shared top bar ─────────────────────────────────────────────── */
+    .m-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 18px 12px;
+    }
+    .m-topbar__gear {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      color: var(--ink);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .m-topbar__gear--ghost { visibility: hidden; pointer-events: none; }
+    .m-topbar__title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--ink);
+      letter-spacing: 0.02em;
+    }
+
     /* ── Today screen ────────────────────────────────────────────────── */
     .m-today { padding: 0 18px 24px; }
     .m-today__topbar {

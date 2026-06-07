@@ -100,6 +100,22 @@ function MobileApp() {
 
 }
 
+// ─── Shared screen header ────────────────────────────────────────────────
+function ScreenHeader({ title }) {
+  return (
+    <div className="m-topbar">
+      <button className="m-topbar__gear" onClick={openTweaks} aria-label="設定">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="3" />
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+        </svg>
+      </button>
+      <div className="m-topbar__title">{title}</div>
+      <div className="m-topbar__gear m-topbar__gear--ghost" aria-hidden="true" />
+    </div>
+  );
+}
+
 // ─── Today screen ────────────────────────────────────────────────────────
 function TodayScreen({
   today, selected, phase, cycleDay, cycleLen, cycleStart, nextPhase, isToday,
@@ -115,16 +131,7 @@ function TodayScreen({
 
   return (
     <div className="m-today">
-      <div className="m-today__topbar">
-        <button className="m-today__settings" onClick={openTweaks} aria-label="設定">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <circle cx="12" cy="12" r="3" />
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-          </svg>
-        </button>
-        <div className="m-today__brand">週期儀表板</div>
-        <button className="m-today__settings m-today__settings--ghost" aria-hidden="true" />
-      </div>
+      <ScreenHeader title="週期儀表板" />
 
       <div className="m-today__dateline" style={{ margin: "0px 0px 6px" }}>
         <button className="m-today__navbtn" onClick={onPrev} aria-label="前一天">
@@ -260,6 +267,7 @@ function CalendarScreen({ today, selected, setSelected, anchor, phaseDays }) {
 
   return (
     <div className="m-cal">
+      <ScreenHeader title="週期月曆" />
       <div className="m-cal__nav">
         <button className="m-cal__navbtn" onClick={() => setMonthOffset(monthOffset - 1)} aria-label="上個月">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -328,10 +336,7 @@ function ReferenceScreen({ currentKey }) {
   const orderedKeys = order.map((_, i) => order[(startIdx + i) % order.length]);
   return (
     <div className="m-ref">
-      <div className="m-ref__head">
-        <h1 className="m-ref__title">週期策略</h1>
-        <p className="m-ref__sub">四個階段的特性與建議</p>
-      </div>
+      <ScreenHeader title="週期策略" />
       {orderedKeys.map((k) => {
         const p = window.PHASES[k];
         const isCur = k === currentKey;
