@@ -1,0 +1,583 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <title>週期儀表板 · 手機版</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+  <!-- PWA ──────────────────────────────────────────────────────────── -->
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#E04A78" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="週期" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=Manrope:wght@500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #1c1c1e;
+      --ink-soft: #3a3a3c;
+      --ink-mute: #8e8e93;
+      --line: #e5e5ea;
+      --line-soft: #f2f2f7;
+      --bg: #f2f2f7;
+      --bg-card: #ffffff;
+    }
+
+    html, body {
+      margin: 0; padding: 0;
+      background: #ECECEE;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Noto Sans TC", "PingFang TC", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 0;
+    }
+
+    /* When opened as installed PWA, fill viewport, no letterbox padding. */
+    @media (display-mode: standalone) {
+      html, body {
+        padding: 0 !important;
+        min-height: 100dvh;
+        background: var(--bg, #f2f2f7);
+        align-items: stretch;
+        justify-content: stretch;
+      }
+    }
+
+    button { font-family: inherit; cursor: pointer; }
+
+    .m-app {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Screen inside the iOS device */
+    .m-screen {
+      position: absolute;
+      inset: 0;
+      background: var(--bg);
+      overflow: hidden;
+    }
+    .m-screen__scroll {
+      position: absolute;
+      top: 54px;      /* below status bar */
+      bottom: 86px;   /* above tab bar (52) + home indicator (34) */
+      left: 0;
+      right: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+    }
+    .m-screen__scroll::-webkit-scrollbar { display: none; }
+    .m-screen__scroll { scrollbar-width: none; }
+
+    /* Standalone (PWA): use full viewport, account for safe-area insets */
+    .m-app--standalone {
+      padding: 0 !important;
+      width: 100vw;
+      min-height: 100dvh;
+      align-items: stretch !important;
+      justify-content: stretch !important;
+    }
+    .m-screen.is-standalone {
+      position: relative;
+      width: 100vw;
+      height: 100dvh;
+      min-height: 100dvh;
+    }
+    .m-screen.is-standalone .m-screen__scroll {
+      top: env(safe-area-inset-top, 0px);
+      bottom: calc(58px + env(safe-area-inset-bottom, 0px));
+    }
+
+    /* ── Today screen ────────────────────────────────────────────────── */
+    .m-today { padding: 0 18px 24px; }
+    .m-today__topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 0 14px;
+    }
+    .m-today__settings {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      color: var(--ink);
+      font-size: 18px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .m-today__settings--ghost { visibility: hidden; }
+    .m-today__brand {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--ink);
+      letter-spacing: 0.02em;
+    }
+
+    .m-today__dateline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .m-today__navbtn {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      color: var(--ink);
+      font-size: 22px;
+      line-height: 1;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .m-today__date {
+      flex: 1;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .m-today__date-main {
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: 0.02em;
+    }
+    .m-today__back {
+      background: var(--line-soft);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 3px 10px;
+      font-size: 11px;
+      color: var(--ink-soft);
+    }
+
+    /* Cycle ring */
+    .m-ring {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 10px auto 18px;
+      width: 260px;
+      height: 260px;
+    }
+    .m-ring__center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      pointer-events: none;
+    }
+    .m-ring__chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px 6px 10px;
+      border-radius: 999px;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      border: 1px solid;
+      box-shadow: inset 0 -1px 0 rgba(0,0,0,0.08);
+    }
+    .m-ring__dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      box-shadow: 0 0 0 3px rgba(255,255,255,0.55);
+    }
+    .m-ring__day {
+      font-family: "Manrope", -apple-system, sans-serif;
+      font-size: 42px;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: 0.02em;
+      line-height: 1;
+    }
+    .m-ring__day-total {
+      font-size: 18px;
+      color: var(--ink-mute);
+      font-weight: 600;
+    }
+
+    /* Quote card */
+    .m-card {
+      background: var(--bg-card);
+      border-radius: 22px;
+      padding: 18px 18px;
+      margin-bottom: 14px;
+      box-shadow: 0 1px 0 rgba(0,0,0,0.03);
+      border: 1px solid var(--line);
+    }
+    .m-card--quote {
+      border-width: 1px;
+      padding: 16px 18px 18px;
+    }
+    .m-card__eyebrow {
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      opacity: 0.85;
+    }
+    .m-card__quote {
+      font-size: 21px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      line-height: 1.5;
+      text-wrap: balance;
+    }
+    .m-card__quote-mark {
+      font-size: 0.85em;
+      opacity: 0.55;
+      font-weight: 400;
+    }
+    .m-card--explain {
+      background: var(--bg-card);
+    }
+    .m-card__text {
+      margin: 0;
+      font-size: 14.5px;
+      line-height: 1.75;
+      color: var(--ink-soft);
+      text-wrap: pretty;
+    }
+    .m-card__exercise {
+      margin-top: 12px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      background: var(--line-soft);
+      border-left: 3px solid;
+    }
+    .m-card__exercise-label {
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--ink-mute);
+      margin-bottom: 5px;
+    }
+    .m-card__exercise-text {
+      margin: 0;
+      font-size: 13.5px;
+      line-height: 1.7;
+      color: var(--ink);
+      text-wrap: pretty;
+    }
+
+    /* Stats */
+    .m-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 4px;
+    }
+    .m-stat {
+      background: var(--bg-card);
+      border-radius: 16px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+    }
+    .m-stat__label {
+      font-size: 10.5px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: var(--ink-mute);
+      margin-bottom: 4px;
+    }
+    .m-stat__value {
+      font-size: 14.5px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+    .m-stat__sub {
+      font-size: 11.5px;
+      color: var(--ink-mute);
+      margin-top: 2px;
+    }
+
+    /* ── Calendar screen ─────────────────────────────────────────────── */
+    .m-cal { padding: 0 16px 16px; }
+    .m-cal__nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 0 16px;
+    }
+    .m-cal__navbtn {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      color: var(--ink);
+      font-size: 22px;
+      line-height: 1;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .m-cal__monthlabel {
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: 0.02em;
+    }
+    .m-cal__legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 14px;
+      padding: 10px 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      margin-bottom: 14px;
+      font-size: 12px;
+      color: var(--ink-soft);
+    }
+    .m-cal__legend-item { display: inline-flex; align-items: center; gap: 6px; }
+    .m-cal__legend-swatch {
+      width: 14px; height: 14px;
+      border-radius: 4px;
+      border: 1px solid;
+    }
+
+    .m-cal__weekrow {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      padding: 0 2px 4px;
+      gap: 4px;
+    }
+    .m-cal__weekday {
+      text-align: center;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--ink-mute);
+      padding: 4px 0;
+    }
+    .m-cal__grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      padding: 4px 2px;
+    }
+    .m-cal__cell {
+      position: relative;
+      aspect-ratio: 1 / 1;
+      border: 0;
+      padding: 0;
+      border-radius: 10px;
+      font-family: "Manrope", -apple-system, sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform .08s ease;
+    }
+    .m-cal__cell--empty { background: transparent !important; pointer-events: none; }
+    .m-cal__cell.is-today { box-shadow: 0 0 0 2.5px var(--ink); z-index: 1; }
+    .m-cal__cell.is-selected:not(.is-today) { box-shadow: 0 0 0 2.5px var(--ink); z-index: 1; }
+    .m-cal__cell:active { transform: scale(0.95); }
+    .m-cal__num { display: inline-block; }
+    .m-cal__dot {
+      position: absolute;
+      bottom: 3px;
+      font-size: 6px;
+      opacity: 0.65;
+    }
+    .m-cal__hint {
+      margin: 16px 4px 0;
+      font-size: 12px;
+      color: var(--ink-mute);
+      text-align: center;
+    }
+
+    /* ── Reference screen ────────────────────────────────────────────── */
+    .m-ref { padding: 0 16px 24px; }
+    .m-ref__head { padding: 0 4px 16px; }
+    .m-ref__title {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: 0.02em;
+    }
+    .m-ref__sub {
+      margin: 4px 0 0;
+      font-size: 13px;
+      color: var(--ink-mute);
+    }
+    .m-ref__card {
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 14px;
+      box-shadow: 0 1px 0 rgba(0,0,0,0.03);
+    }
+    .m-ref__card.is-current {
+      border-width: 2px;
+      box-shadow: 0 8px 24px -12px rgba(0,0,0,0.25);
+    }
+    .m-ref__cardhead {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 18px;
+    }
+    .m-ref__cardtitle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+    .m-ref__dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      box-shadow: 0 0 0 3px rgba(255,255,255,0.45);
+    }
+    .m-ref__nowtag {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      background: rgba(255,255,255,0.6);
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
+    .m-ref__cardbody { padding: 14px 18px 18px; }
+    .m-ref__quote {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+    .m-ref__explain {
+      margin: 0 0 14px;
+      font-size: 13.5px;
+      line-height: 1.7;
+      color: var(--ink-soft);
+      text-wrap: pretty;
+    }
+    .m-ref__lists {
+      display: grid;
+      gap: 12px;
+    }
+    .m-ref__exercise {
+      margin: 0;
+      font-size: 13.5px;
+      line-height: 1.7;
+      color: var(--ink-soft);
+      text-wrap: pretty;
+    }
+    .m-ref__listlabel {
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--ink-mute);
+      margin-bottom: 6px;
+    }
+    .m-ref__list ol {
+      margin: 0;
+      padding-left: 1.1em;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--ink-soft);
+    }
+    .m-ref__list li + li { margin-top: 4px; }
+
+    /* ── Bottom tab bar ──────────────────────────────────────────────── */
+    .m-tabbar {
+      position: absolute;
+      left: 0; right: 0; bottom: 34px; /* above home indicator (inside iOS frame) */
+      height: 52px;
+      display: flex;
+      align-items: stretch;
+      justify-content: space-around;
+      background: rgba(255,255,255,0.88);
+      backdrop-filter: saturate(140%) blur(12px);
+      -webkit-backdrop-filter: saturate(140%) blur(12px);
+      border-top: 1px solid var(--line);
+      z-index: 20;
+    }
+    .m-tabbar--standalone {
+      bottom: 0;
+      height: calc(52px + env(safe-area-inset-bottom, 0px));
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    .m-tab {
+      flex: 1;
+      background: transparent;
+      border: 0;
+      padding: 6px 0 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      color: var(--ink-mute);
+      font-size: 10.5px;
+      font-weight: 600;
+    }
+    .m-tab__icon { display: flex; align-items: center; justify-content: center; }
+    .m-tab.is-on { color: #E04A78; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script>
+    // Bridge: standalone wakeups for the tweak panel.
+    (function () {
+      window.addEventListener('message', (e) => {
+        const t = e?.data?.type;
+        if (t === '__edit_mode_dismissed') {
+          // panel closed via its own ✕ — no-op in standalone
+        }
+      });
+    })();
+
+    // PWA service worker — registers once per origin. Browsers ignore this
+    // on insecure origins (http://) except localhost, so on the in-editor
+    // preview it may no-op, but the page still works fine; once deployed to
+    // HTTPS (or saved offline) the SW caches the shell for offline use.
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch((err) => {
+          console.warn('[pwa] sw register failed:', err && err.message);
+        });
+      });
+    }
+  </script>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <script src="data.js"></script>
+  <script type="text/babel" src="tweaks-panel.jsx"></script>
+  <script type="text/babel" src="ios-frame.jsx"></script>
+  <script type="text/babel" src="mobile-app.jsx"></script>
+  <script type="text/babel">
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<window.MobileApp />);
+  </script>
+</body>
+</html>
